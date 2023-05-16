@@ -1,0 +1,51 @@
+﻿@model List<CRUD_Persona.Models.ListPersonaViewModel>
+@{
+    ViewBag.Title = "Lista Empleados";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>RUT</th>
+            <th>Nombre</th>
+            <th>Fecha Nacimiento</th>
+            <th>Departamento</th>
+            <th>Salario</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+    </tbody>
+</table>
+@section scripts{
+<script>
+    $(document).ready(function () {
+        $("#table_id").DataTable({
+            "processing": true,
+            "serverSide":true,
+            "ajax": {
+                "url": "@Url.Content("~/Persona/Json")",
+                "type": "POST",
+                "datatype":"json"
+            },
+            "pageLength": 10,
+            "filter": false,
+            "responsivePriority": 1,
+            "data": null,
+            "columns": [
+                { "data": "Id", "name": "ID", "autoWidth": true },
+                { "data": "Rut", "name": "RUT", "autoWidth": true },
+                { "data": "Nombre", "name": "Nombre", "autoWidth": true },
+                { "data": "FecNac", "format":"DD/MM/YYYY","name": "Fecha Nacimiento", "autoWidth": true },
+                { "data": "Departamento", "name": "Departamento", "autoWidth": true },
+                { "data": "Salario", "name": "Salario", "autoWidth": true }
+
+            ]
+        });
+    })
+</script>
+}
+
