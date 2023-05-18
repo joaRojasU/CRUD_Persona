@@ -13,10 +13,10 @@ namespace CRUD_Persona.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class CRUDEntities : DbContext
+    public partial class CRUD_DBEntities : DbContext
     {
-        public CRUDEntities()
-            : base("name=CRUDEntities")
+        public CRUD_DBEntities()
+            : base("name=CRUD_DBEntities")
         {
         }
     
@@ -25,6 +25,6 @@ namespace CRUD_Persona.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Persona> Persona { get; set; }
+        public virtual DbSet<Persona> Personas { get; set; }
     }
 }

@@ -14,11 +14,11 @@ namespace CRUD_Persona.Models
     
     public partial class Persona
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string Rut { get; set; }
         public string Nombre { get; set; }
-        public DateTime FecNac { get; set; }
+        public string Email { get; set; }
         public string Departamento { get; set; }
-        public Nullable<int> Salario { get; set; }
+        public string Telefono { get; set; }
     }
 }
