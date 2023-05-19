@@ -10,6 +10,8 @@
     <link href="~/Content/fontawesome/css/all.css" rel="stylesheet" />
     <link href="~/Content/datatable/css/responsive.dataTables.min.css" rel="stylesheet" />
     <link href="~/Content/datatable/css/buttons.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/datatable/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+
 
 
 </head>
@@ -24,9 +26,9 @@
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     @*
-            <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-            <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-            <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                     *@
                 </ul>
                 <p style="color: white; font-weight: bold; display: inline-block; vertical-align: middle; line-height: normal">@DateTime.Now.ToString("dd/MM/yyyy") </p>
@@ -50,7 +52,11 @@
     <script src="~/Content/fontawesome/js/all.js"></script>
     <script src="~/Content/datatable/js/dataTables.responsive.min.js"></script>
     <script src="~/Content/datatable/js/buttons.dataTables.min.js"></script>
-
+    <script src="~/Content/datatable/js/buttons.html5.min.js"></script>
+    <script src="~/Content/datatable/js/buttons.print.min.js"></script>
+    <script src="~/Content/datatable/js/buttons.colVis.min.js"></script>
+    
+    <script src="~/Scripts/jszip.min.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
