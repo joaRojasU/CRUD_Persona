@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
@@ -23,6 +24,75 @@ namespace CRUD_Persona.Controllers
         {
             return View();
         }
+
+        public static bool ValidaRut(string rut)
+        {
+            rut = rut.Replace(".", "").ToUpper();
+            Regex expresion = new Regex("^([0-9]+-[0-9K])$");
+            string dv = rut.Substring(rut.Length - 1, 1);
+            if (!expresion.IsMatch(rut))
+            {
+                return false;
+            }
+            char[] charCorte = { '-' };
+            string[] rutTemp = rut.Split(charCorte);
+            if (dv != Digito(int.Parse(rutTemp[0])))
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        /// <summary>
+        /// Método que valida el rut con el digito verificador
+        /// por separado
+        /// </summary>
+        /// <param name="rut">integer</param>
+        /// <param name="dv">char</param>
+        /// <returns>booleano</returns>
+        public static bool ValidaRut(string rut, string dv)
+        {
+            return ValidaRut(rut + "-" + dv);
+        }
+
+        /// <summary>
+        /// método que calcula el digito verificador a partir
+        /// de la mantisa del rut
+        /// </summary>
+        /// <param name="rut"></param>
+        /// <returns></returns>
+        public static string Digito(int rut)
+        {
+            int suma = 0;
+            int multiplicador = 1;
+            while (rut != 0)
+            {
+                multiplicador++;
+                if (multiplicador == 8)
+                    multiplicador = 2;
+                suma += (rut % 10) * multiplicador;
+                rut = rut / 10;
+            }
+            suma = 11 - (suma % 11);
+            if (suma == 11)
+            {
+                return "0";
+            }
+            else if (suma == 10)
+            {
+                return "K";
+            }
+            else
+            {
+                return suma.ToString();
+            }
+        }
+
+
+
+
+
         [HttpPost]
         public ActionResult Json()
         {
@@ -44,7 +114,7 @@ namespace CRUD_Persona.Controllers
                 list = (from d in db.Personas
                         select new ListPersonaViewModel
                         {
-                            Id = (int)d.Id,
+                            Id = d.Id,
                             Rut = d.Rut,
                             Nombre = d.Nombre,
                             Email = d.Email,
@@ -74,6 +144,7 @@ namespace CRUD_Persona.Controllers
         public JsonResult Guardar(Persona oPersona) {
 
             bool respuesta = true;
+            bool rutCheck;
             try
             {
                 using (CRUD_DBEntities db = new CRUD_DBEntities())
@@ -85,18 +156,35 @@ namespace CRUD_Persona.Controllers
                         Persona tempPersona = (from p in db.Personas
                                                where p.Rut == oPersona.Rut
                                                select p).FirstOrDefault();
-                        tempPersona.Rut = oPersona.Rut;
-                        tempPersona.Nombre = oPersona.Nombre;
-                        tempPersona.Email = oPersona.Email;
-                        tempPersona.Departamento = oPersona.Departamento;
-                        tempPersona.Telefono = oPersona.Telefono;
+                        rutCheck = ValidaRut(oPersona.Rut);
+                        if (rutCheck)
+                        {
+                            tempPersona.Rut = oPersona.Rut;
+                            tempPersona.Nombre = oPersona.Nombre;
+                            tempPersona.Email = oPersona.Email;
+                            tempPersona.Departamento = oPersona.Departamento;
+                            tempPersona.Telefono = oPersona.Telefono;
 
-                        db.SaveChanges();
+                            db.SaveChanges();
+                        }
+                        else
+                        {
+                            respuesta = false;
+                        }
+                        
                     }
                     else
                     {
-                        db.Personas.Add(oPersona);
-                        db.SaveChanges();
+                        rutCheck = ValidaRut(oPersona.Rut);
+                        if (rutCheck)
+                        {
+                            db.Personas.Add(oPersona);
+                            db.SaveChanges();
+                        }
+                        else
+                        {
+                            respuesta = false;
+                        }
                     }
 
                 }
@@ -152,6 +240,70 @@ namespace CRUD_Persona.Controllers
             }
             
             return Json(new { resultado = respuesta }, JsonRequestBehavior.AllowGet);
+        }
+        
+        public ActionResult Buscar(string filtro, string searchInput)     {
+                  
+            
+
+           
+            List<ListPersonaViewModel> list = new List<ListPersonaViewModel>();
+            List<ListPersonaViewModel> list2 = new List<ListPersonaViewModel>();
+            bool respuesta = true;
+            using (CRUD_DBEntities db = new CRUD_DBEntities())
+
+            {
+                list2 = (from d in db.Personas
+                        select new ListPersonaViewModel
+                        {
+                            Id = d.Id,
+                            Rut = d.Rut,
+                            Nombre = d.Nombre,
+                            Email = d.Email,
+                            Departamento = d.Departamento,
+                            Telefono = d.Telefono
+                        }).ToList();
+
+                if (filtro == "filtroRut")
+                {
+                    list = list2.Where(x => x.Rut.Contains(searchInput)).ToList();
+                    
+                    recordsTotal = list.Count();
+                    respuesta = true;
+                }
+                else if (filtro == "filtroNombre")
+                {
+                    list = list2.Where(x => x.Nombre.Contains(searchInput)).ToList();
+                    recordsTotal = list.Count();
+                    respuesta = true;
+                }
+                else if (filtro == "filtroEmail")
+                {
+                    list = list2.Where(x => x.Email.Contains(searchInput)).ToList();
+                    recordsTotal = list.Count();
+                    respuesta = true;
+                }
+                else if (filtro == "filtroDepartamento")
+                {
+                    list = list2.Where(x => x.Departamento.Contains(searchInput)).ToList();
+                    recordsTotal = list.Count();
+                    respuesta = true;
+                }
+                else if (filtro == "filtroTelefono")
+                {
+                    list = list2.Where(x => x.Telefono.Contains(searchInput)).ToList();
+                    recordsTotal = list.Count();
+                    respuesta = true;
+                }
+                else {
+                    respuesta = false;
+                }
+                draw = "1";
+
+
+            }
+
+                return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = list });
         }
     }
 }

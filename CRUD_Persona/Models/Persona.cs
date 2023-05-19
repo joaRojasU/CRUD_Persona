@@ -11,14 +11,20 @@ namespace CRUD_Persona.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class Persona
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
+        [Required]
         public string Rut { get; set; }
+        [Required]
         public string Nombre { get; set; }
+        [Required]
         public string Email { get; set; }
+        [Required]
         public string Departamento { get; set; }
+        [Required]
         public string Telefono { get; set; }
     }
 }
