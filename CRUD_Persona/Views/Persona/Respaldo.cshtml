@@ -1,0 +1,306 @@
+﻿@model List<CRUD_Persona.Models.ListPersonaViewModel>
+@{
+    ViewBag.Title = "Lista Empleados";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+<br />
+<div>
+    <label for="search">Buscar:</label>
+    <input type="text" id="search" />
+
+    <label for="filter">Filtros:</label>
+    <select id="filter">
+        <option value="filtroRut">RUT</option>
+        <option value="filtroNombre">Nombre</option>
+        <option value="filtroEmail">Email</option>
+        <option value="filtroDepartamento">Departamento</option>
+        <option value="filtroTelefono">Telefono</option>
+    </select>
+    <button id="botonBuscar" class="btn btn-info">Buscar</button>
+</div>
+<br />
+<div>
+    <button id="botonImprime" style="float:right;margin:4px"><i class='fas fa-print'></i></button>
+    <button id="botonPlanilla" style="float:right;margin:4px"><i class='far fa-file-pdf'></i></button>
+    <button id="botonAdd" class="btn btn-success" data-toggle="modal fade" data-target="#FormModal">Agregar Empleado</button>
+</div>
+<br />
+<div class="row m-4">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                Gestion Empleados
+            </div>
+            <div class="card-body">
+                <table class="display responsive nowrap" id="table_id" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>RUT</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Departamento</th>
+                            <th>Telefono</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal" id="FormModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Rol</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+
+
+                        <input type="hidden" id="txtIdPersona" />
+                        <div class="form-group">
+                            <label for="txtRut">Rut:</label>
+                            <input type="text" class="form-control" id="txtRut">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtNombre">Nombre:</label>
+                            <input type="text" class="form-control" id="txtNombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="txt">Email:</label>
+                            <input type="email" class="form-control" id="txtEmail">
+                        </div>
+                        <div class="form-group">
+                            <label for="txt">Departamento:</label>
+                            <input type="text" class="form-control" id="txtDepto">
+                        </div>
+                        <div class="form-group">
+                            <label for="txt">Telefono:</label>
+                            <input type="tel" class="form-control" id="txtTelefono">
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button id="btnCerrar" type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+
+
+    <script>
+        var tabla_persona;
+        var botonAgregar = document.getElementById('botonAdd');
+        var botonCerrar = document.getElementById('btnCerrar');
+        var botonBuscar = document.getElementById('botonBuscar');
+        var botonPrint = document.getElementById('botonImprime');
+    $(document).ready(function () {
+        tabla_persona = $("#table_id").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "bFilter": true,
+            "bSort": true,
+            "ajax": {
+                "url": "@Url.Content("~/Persona/Json")",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "pageLength": 10,
+            "filter": true,
+            "responsivePriority": 1,
+            "data": null,
+            "columns": [
+                { "data": "Id", "name": "Id", "autoWidth": true, "searchable": true },
+                { "data": "Rut", "name": "RUT", "autoWidth": true, "searchable": true },
+                { "data": "Nombre", "name": "Nombre", "autoWidth": true, "searchable": true },
+                { "data": "Email", "name": "Email", "autoWidth": true, "searchable": true },
+                { "data": "Departamento", "name": "Departamento", "autoWidth": true, "searchable": true },
+                { "data": "Telefono", "name": "Telefono", "autoWidth": true, "searchable": true },
+                { "data": "Id", "name": "ID", "autoWidth": true, "render": function (data) {
+                        return "<button class='btn btn-primary btn-sm' type='button' onclick='abrirModal(" + data + ")'><i class='fas fa-pen'></i></button>" +
+                        "<button class='btn btn-danger btn-sm ml-2' type='button' onclick='Eliminar(" + data + ")'><i class='fa fa-trash'></i></button>"}
+                }
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: 'Agregar Nuevo',
+                    attr: { class: 'btn btn-success btn-sm' },
+                    action: function (e, dt, node, config) {
+                        abrirModal(0)
+                    }
+                }
+            ]
+        });
+    })
+
+
+    function abrirModal($Id) {
+
+        $("#txtIdPersona").val($Id);
+        if ($Id != 0) {
+            jQuery.ajax({
+                url: "@Url.Action("Obtener","Persona")" + "?Id=" + $Id,
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data != null) {
+                        $("#txtNombre").val(data.Nombre);
+                        $("#txtRut").val(data.Rut);
+                        $("#txtEmail").val(data.Email);
+                        $("#txtDepto").val(data.Departamento);
+                        $("#txtTelefono").val(data.Telefono);
+                    }
+                }
+            });
+        } else {
+                $("#txtNombre").val("");
+                $("#txtRut").val("");
+                $("#txtEmail").val("");
+                $("#txtDepto").val("");
+                $("#txtTelefono").val("");
+        }
+
+        $("#FormModal").modal('show');
+
+    }
+    function Eliminar($Id) {
+            if (confirm("Esta por eliminar al usuario con ID: "+$Id)) {
+                jQuery.ajax({
+                    url: "@Url.Action("Eliminar","Persona")" + "?Id=" + $Id,
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.resultado) {
+                            tabla_persona.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+        function Buscar() {
+
+            var varFiltro = document.getElementById("filter").value;
+            var varBuscar = document.getElementById("search").value;
+            tabla_persona.destroy();
+            tabla_persona = $("#table_id").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "searching": false,
+                "bFilter": true,
+                "bSort": true,
+                "ajax":({
+                    "url": '@Url.Action("Buscar","Persona")',
+                    "data": function (d) {
+                        d.filtro = $('#filter').val();
+                        d.searchInput = $('#search').val();
+                    },
+                    "type": "POST",
+                    "dataType": "json",
+                    "pageLength": 10,
+                    "filter": true,
+                    "responsivePriority": 1,
+                    "columns": [
+                        { "data": "Id", "name": "Id", "autoWidth": true, "searchable": true },
+                        { "data": "Rut", "name": "RUT", "autoWidth": true, "searchable": true },
+                        { "data": "Nombre", "name": "Nombre", "autoWidth": true, "searchable": true },
+                        { "data": "Email", "name": "Email", "autoWidth": true, "searchable": true },
+                        { "data": "Departamento", "name": "Departamento", "autoWidth": true, "searchable": true },
+                        { "data": "Telefono", "name": "Telefono", "autoWidth": true, "searchable": true },
+                        {
+                            "data": "Id", "name": "ID", "autoWidth": true, "render": function (data) {
+                                return "<button class='btn btn-primary btn-sm' type='button' onclick='abrirModal(" + data + ")'><i class='fas fa-pen'></i></button>" +
+                                    "<button class='btn btn-danger btn-sm ml-2' type='button' onclick='Eliminar(" + data + ")'><i class='fa fa-trash'></i></button>"
+                            }
+                        }
+                    ],
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            text: 'Agregar Nuevo',
+                            attr: { class: 'btn btn-success btn-sm' },
+                            action: function (e, dt, node, config) {
+                                abrirModal(0)
+                            }
+                        }
+                    ]
+                })
+            })
+        }
+
+        botonPrint.addEventListener('click', function () {
+            
+        });
+
+        botonBuscar.addEventListener('click', function () {
+            Buscar();
+        });
+
+        botonAgregar.addEventListener('click', function () {
+            abrirModal(0);
+        });
+
+        botonCerrar.addEventListener('click', function () {
+            $("#FormModal").modal('hide');
+        });
+
+        function Guardar() {
+            var $data = {
+                oPersona: {
+                    Rut: $("#txtRut").val(),
+                    Nombre: $("#txtNombre").val(),
+                    Email: $("#txtEmail").val(),
+                    Departamento: $("#txtDepto").val(),
+                    Telefono: $("#txtTelefono").val(),
+                }
+            }
+
+            jQuery.ajax({
+                url: "@Url.Action("Guardar", "Persona")",
+                type: "POST",
+                data: JSON.stringify($data),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.resultado) {
+                        tabla_persona.ajax.reload();
+                        $('#FormModal').modal('hide');
+                    } else {
+                        alert("No se pudo guardar los cambios, verifique campos.x");
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+                }
+            });
+        }
+
+
+
+    </script>
+}
+
