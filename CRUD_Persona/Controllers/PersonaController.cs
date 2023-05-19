@@ -6,6 +6,8 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using CRUD_Persona.Models;
+using Microsoft.Ajax.Utilities;
+using Rotativa;
 
 namespace CRUD_Persona.Controllers
 {
@@ -305,5 +307,6 @@ namespace CRUD_Persona.Controllers
 
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = list });
         }
+        
     }
 }
