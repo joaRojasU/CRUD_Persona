@@ -2,9 +2,70 @@
     ViewBag.Title = "Lista Empleados";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<!-- FILTROS 2 DROPDOWN BOX-->
+
+@{
+    var departments = ViewBag.Departments as List<SelectListItem>;
+    var profiles = ViewBag.Profils as List<SelectListItem>;
+}
+
+@Html.DropDownList("SelectedDepartmentId", departments, "Select Department", new { @class = "form-control" })
+@Html.DropDownList("SelectedProfileId",profiles , "Select Profile", new { @class = "form-control"})
+<!-- Modal -->
+<div class="modal" id="FormModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Rol</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+
+
+                        <input type="hidden" id="txtIdPersona" />
+                        <div class="form-group">
+                            <label for="txtRut">Rut:</label>
+                            <input type="text" class="form-control" id="txtRut">
+                        </div>
+                        <div class="form-group">
+                            <label for="txtNombre">Nombre:</label>
+                            <input type="text" class="form-control" id="txtNombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="txt">Email:</label>
+                            <input type="email" class="form-control" id="txtEmail">
+                        </div>
+                        <div class="form-group">
+                            <label for="txt">Departamento:</label>
+                            <input type="text" class="form-control" id="txtDepto">
+                        </div>
+                        <div class="form-group">
+                            <label for="txt">Telefono:</label>
+                            <input type="tel" class="form-control" id="txtTelefono">
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button id="btnCerrar" type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
 
 <h3 class="text-center text-uppercase">REPORTE EMPLEADOS</h3>
-
+<!--TABLA PRINCIPAL-->
 <table id="tabla-main" class="table table-bordered" style="width:100%">
     <thead class="thead-dark">
         <tr>
@@ -14,14 +75,17 @@
             <th>Email</th>
             <th>Departamento</th>
             <th>Telefono</th>
+            <th>Opciones</th>
         </tr>
     </thead>
 </table>
 
 @section scripts{
+
     <script type="text/javascript">
+        var tabla_persona;
         $(document).ready(function(){
-            $('#tabla-main').DataTable({
+            tabla_persona=$('#tabla-main').DataTable({
                 "ajax":{
                     "url": "@Url.Content("~/Persona/Json")",
                     "type": 'Get',
@@ -33,37 +97,137 @@
                     {'data':'Nombre'},
                     {'data':'Email'},
                     {'data':'Departamento'},
-                    {'data':'Telefono'},
+                    { 'data': 'Telefono' },
+                    {
+                        "data": "Id", "name": "ID", "autoWidth": true, "render": function (data) {
+                            return "<button class='btn btn-primary btn-sm' type='button' onclick='abrirModal(" + data + ")'><i class='fas fa-pen'></i></button>" +
+                                "<button class='btn btn-danger btn-sm ml-2' type='button' onclick='Eliminar(" + data + ")'><i class='fa fa-trash'></i></button>"
+                        }
+                    }
                 ],
                 "dom":'Brftip',
-                "buttons":[
+                "buttons": [
+
                     {
                         extend: 'copy',
                         className:'btn btn-dark rounded-0',
-                        text:'<i class="far fa-copy"></i> Copy'
+                        text:'<i class="far fa-copy"></i>'
                     },
                     {
                         extend: 'excel',
                         className:'btn btn-dark rounded-0',
-                        text:'<i class="far fa-file-excel"></i> Excel'
+                        text:'<i class="far fa-file-excel"></i>'
                     },
                     {
                         extend: 'pdf',
                         className:'btn btn-dark rounded-0',
-                        text:'<i class="far fa-file-pdf"></i> PDF'
+                        text:'<i class="far fa-file-pdf"></i>'
                     },
                     {
                         extend: 'csv',
                         className:'btn btn-dark rounded-0',
-                        text:'<i class="fas fa-file-csv"></i> CSV'
+                        text:'<i class="fas fa-file-csv"></i>'
                     },
                     {
                         extend: 'print',
                         className:'btn btn-dark rounded-0',
-                        text:'<i class="fas fa-print"></i> Print'
+                        text:'<i class="fas fa-print"></i>'
                     },
+                    {
+                        text: 'Agregar Nuevo',
+                        className: 'btn btn-dark rounded-0',
+                        action: function ()
+                        {
+                            abrirModal(0)
+                        }
+                    }
                 ]
             })
         })
+
+        function abrirModal($Id) {
+
+        $("#txtIdPersona").val($Id);
+        if ($Id != 0) {
+            jQuery.ajax({
+                url: "@Url.Action("Obtener","Persona")" + "?Id=" + $Id,
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data != null) {
+                        $("#txtNombre").val(data.Nombre);
+                        $("#txtRut").val(data.Rut);
+                        $("#txtEmail").val(data.Email);
+                        $("#txtDepto").val(data.Departamento);
+                        $("#txtTelefono").val(data.Telefono);
+                    }
+                }
+            });
+        } else {
+                $("#txtNombre").val("");
+                $("#txtRut").val("");
+                $("#txtEmail").val("");
+                $("#txtDepto").val("");
+                $("#txtTelefono").val("");
+        }
+
+        $("#FormModal").modal('show');
+
+        }
+        function Guardar() {
+            var $data = {
+                oPersona: {
+                    Rut: $("#txtRut").val(),
+                    Nombre: $("#txtNombre").val(),
+                    Email: $("#txtEmail").val(),
+                    Departamento: $("#txtDepto").val(),
+                    Telefono: $("#txtTelefono").val(),
+                }
+            }
+
+            jQuery.ajax({
+                url: "@Url.Action("Guardar", "Persona")",
+                type: "POST",
+                data: JSON.stringify($data),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.resultado) {
+                        tabla_persona.ajax.reload();
+                        $('#FormModal').modal('hide');
+                    } else {
+                        alert("No se pudo guardar los cambios, verifique campos.x");
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                },
+                beforeSend: function () {
+                }
+            });
+        }
+
+        function Eliminar($Id) {
+            if (confirm("Esta por eliminar al usuario con ID: "+$Id)) {
+                jQuery.ajax({
+                    url: "@Url.Action("Eliminar","Persona")" + "?Id=" + $Id,
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data!=null) {
+                            tabla_persona.ajax.reload();
+                        }
+                    }
+                });
+            }
+        }
+        var botonCerrar = document.getElementById('btnCerrar');
+        botonCerrar.addEventListener('click', function () {
+            $("#FormModal").modal('hide');
+        });
+
+
     </script>
-    }
+}

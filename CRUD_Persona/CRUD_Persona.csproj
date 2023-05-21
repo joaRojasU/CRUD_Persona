@@ -133,6 +133,31 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PersonaController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
+    <Compile Include="Models\DB_TEST.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DB_TEST.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DB_TEST.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DB_TEST.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DB_TEST.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DB_TEST.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Departamento.cs">
+      <DependentUpon>DB_TEST.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FilterUsuariosByDeptAndProfile_Result.cs">
+      <DependentUpon>DB_TEST.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Perfil.cs">
+      <DependentUpon>DB_TEST.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\RutController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -156,6 +181,11 @@
     <Compile Include="Models\ListPersonaViewModel.cs" />
     <Compile Include="Models\Persona.cs">
       <DependentUpon>DB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UsuarioGrid.cs" />
+    <Compile Include="Models\UsuarioViewModel.cs" />
+    <Compile Include="Models\Usuario_Sistema.cs">
+      <DependentUpon>DB_TEST.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -2253,6 +2283,16 @@
       <DependentUpon>DB.edmx</DependentUpon>
       <LastGenOutput>DB.cs</LastGenOutput>
     </Content>
+    <Content Include="Models\DB_TEST.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DB_TEST.edmx</DependentUpon>
+      <LastGenOutput>DB_TEST.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\DB_TEST.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DB_TEST.edmx</DependentUpon>
+      <LastGenOutput>DB_TEST.cs</LastGenOutput>
+    </Content>
     <Content Include="Rotativa\help-wkhtmltoimage.txt" />
     <Content Include="Rotativa\help-wkhtmltopdf.txt" />
     <Content Include="Rotativa\wkhtmltoimage.exe" />
@@ -2324,6 +2364,13 @@
       <DependentUpon>DB.edmx</DependentUpon>
     </Content>
     <Content Include="App_Browsers\qt.browser" />
+    <EntityDeploy Include="Models\DB_TEST.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DB_TEST.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\DB_TEST.edmx.diagram">
+      <DependentUpon>DB_TEST.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -2353,11 +2400,12 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Persona\Respaldo.cshtml" />
+    <Content Include="Views\Persona\Index000.cshtml" />
     <Content Include="Views\Persona\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Test\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

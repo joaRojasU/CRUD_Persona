@@ -16,10 +16,27 @@ namespace CRUD_Persona.Controllers
     public class PersonaController : Controller
     {
         private readonly CRUD_DBEntities db_read = new CRUD_DBEntities();
+        private readonly CRUD_DBEntities_Test db_read1 = new CRUD_DBEntities_Test();
         // GET: Persona
 
         public ActionResult Index()
         {
+            var departments = db_read1.Departamentoes.Select(d => new SelectListItem
+            {
+                Value = d.Id.ToString(),
+                Text = d.nombre_dpto
+            }).ToList();
+
+            ViewBag.Departments = departments;
+
+            var profiles = db_read1.Perfils.Select(d => new SelectListItem
+            {
+                Value = d.Id_perfil.ToString(),
+                Text = d.Perfil1
+            }).ToList();
+
+            ViewBag.Profils = profiles;
+
             return View();
         }
 
